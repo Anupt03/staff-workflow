@@ -44,7 +44,7 @@ const Login = ({ handleLogin }) => {
                         <ShieldCheck className='w-8 h-8 text-slate-950 stroke-[2.5]' />
                     </div>
                     <h1 className='text-3xl font-extrabold text-white tracking-tight flex items-center gap-2'>
-                        EMS <span className='text-emerald-400 font-bold'>Pro</span>
+                        StaffFlow <span className='text-emerald-400 font-bold'>Pro</span>
                     </h1>
                     <p className='text-sm text-slate-400 mt-1 font-medium'>Sign in to manage your workforce & active tasks</p>
                 </div>
