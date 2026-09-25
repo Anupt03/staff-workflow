@@ -1,14 +1,17 @@
 import React, { useContext } from 'react'
 import { Sparkles, Calendar, ArrowRight } from 'lucide-react'
 import { AuthContext } from '../../context/AuthProvider'
+import { useToast } from '../../context/ToastContext'
 
 const NewTask = ({ data, employeeId }) => {
     const contextValue = useContext(AuthContext)
     const actions = contextValue && contextValue[2]
+    const { showToast } = useToast()
 
     const handleAccept = async () => {
         if (actions && actions.updateTaskStatus) {
             await actions.updateTaskStatus(data.id || data.taskTitle, 'active', employeeId)
+            showToast(`Task "${data.taskTitle}" accepted! Moving to active.`, 'info')
         }
     }
 

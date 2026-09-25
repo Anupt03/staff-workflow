@@ -4,12 +4,14 @@ import EmployeeDashboard from './components/Dashboard/EmployeeDashboard'
 import AdminDashboard from './components/Dashboard/AdminDashboard'
 import { AuthContext } from './context/AuthProvider'
 import { supabase, isSupabaseConfigured } from './utils/supabaseClient'
+import { useToast } from './context/ToastContext'
 
 const App = () => {
   const [user, setUser] = useState(null)
   const [loggedInUserData, setLoggedInUserData] = useState(null)
   const contextValue = useContext(AuthContext)
   const userData = Array.isArray(contextValue) ? contextValue[0] : null
+  const { showToast } = useToast()
 
   useEffect(() => {
     const loggedInUser = localStorage.getItem('loggedInUser')
@@ -43,12 +45,14 @@ const App = () => {
             setUser('admin')
             setLoggedInUserData(matchedProfile)
             localStorage.setItem('loggedInUser', JSON.stringify({ role: 'admin', data: matchedProfile }))
-            return
+            showToast('Welcome back, Admin!', 'success')
+            return true
           } else {
             setUser('employee')
             setLoggedInUserData(matchedProfile)
             localStorage.setItem('loggedInUser', JSON.stringify({ role: 'employee', data: matchedProfile }))
-            return
+            showToast(`Welcome back, ${matchedProfile.first_name || matchedProfile.firstName || 'Employee'}!`, 'success')
+            return true
           }
         }
       } catch (err) {
@@ -62,17 +66,23 @@ const App = () => {
       setUser('admin')
       setLoggedInUserData({ firstName: 'Admin', email: cleanEmail, role: 'admin' })
       localStorage.setItem('loggedInUser', JSON.stringify({ role: 'admin', data: { firstName: 'Admin', email: cleanEmail } }))
+      showToast('Welcome back, Admin!', 'success')
+      return true
     } else if (userData) {
       const employee = userData.find((e) => e.email.toLowerCase() === cleanEmail && e.password === password)
       if (employee) {
         setUser('employee')
         setLoggedInUserData(employee)
         localStorage.setItem('loggedInUser', JSON.stringify({ role: 'employee', data: employee }))
+        showToast(`Welcome back, ${employee.firstName}!`, 'success')
+        return true
       } else {
-        alert("Invalid Credentials")
+        showToast('Invalid email or password. Please try again.', 'error')
+        return false
       }
     } else {
-      alert("Invalid Credentials")
+      showToast('Invalid email or password. Please try again.', 'error')
+      return false
     }
   }
 

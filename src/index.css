@@ -7,6 +7,7 @@
     font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
     background-color: #030712;
     color: #f3f4f6;
+    overflow-x: hidden;
   }
 }
 
@@ -28,7 +29,7 @@
 
 /* Custom Glass Utilities */
 .glass-panel {
-  background: rgba(15, 23, 42, 0.7);
+  background: rgba(15, 23, 42, 0.75);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid rgba(255, 255, 255, 0.08);
@@ -47,6 +48,32 @@
 
 .glass-card-hover:hover {
   transform: translateY(-4px);
-  box-shadow: 0 20px 30px -10px rgba(0, 0, 0, 0.5);
-  border-color: rgba(16, 185, 129, 0.3);
+  box-shadow: 0 20px 30px -10px rgba(0, 0, 0, 0.6);
+  border-color: rgba(16, 185, 129, 0.35);
 }
+
+/* Toast Slide In Animation */
+@keyframes toastSlideIn {
+  from {
+    transform: translateY(-100%) scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+.animate-toast {
+  animation: toastSlideIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Fade in animation */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out forwards;
+}

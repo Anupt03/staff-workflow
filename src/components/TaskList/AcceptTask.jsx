@@ -1,20 +1,24 @@
 import React, { useContext } from 'react'
 import { Clock, Calendar, CheckCircle2, XCircle } from 'lucide-react'
 import { AuthContext } from '../../context/AuthProvider'
+import { useToast } from '../../context/ToastContext'
 
 const AcceptTask = ({ data, employeeId }) => {
     const contextValue = useContext(AuthContext)
     const actions = contextValue && contextValue[2]
+    const { showToast } = useToast()
 
     const handleComplete = async () => {
         if (actions && actions.updateTaskStatus) {
             await actions.updateTaskStatus(data.id || data.taskTitle, 'completed', employeeId)
+            showToast(`Task "${data.taskTitle}" marked as completed!`, 'success')
         }
     }
 
     const handleFail = async () => {
         if (actions && actions.updateTaskStatus) {
             await actions.updateTaskStatus(data.id || data.taskTitle, 'failed', employeeId)
+            showToast(`Task "${data.taskTitle}" marked as failed.`, 'error')
         }
     }
 

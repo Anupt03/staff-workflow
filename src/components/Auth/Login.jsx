@@ -1,16 +1,22 @@
 import React, { useState } from 'react'
-import { Mail, Lock, Eye, EyeOff, ShieldCheck, Sparkles, UserCheck } from 'lucide-react'
+import { Mail, Lock, Eye, EyeOff, ShieldCheck, Sparkles, UserCheck, Loader2 } from 'lucide-react'
 
 const Login = ({ handleLogin }) => {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [showPassword, setShowPassword] = useState(false)
+    const [isSubmitting, setIsSubmitting] = useState(false)
 
-    const submitHandler = (e) => {
+    const submitHandler = async (e) => {
         e.preventDefault()
-        handleLogin(email, password)
-        setEmail("")
-        setPassword("")
+        if (!email.trim() || !password.trim()) return
+
+        setIsSubmitting(true)
+        try {
+            await handleLogin(email, password)
+        } finally {
+            setIsSubmitting(false)
+        }
     }
 
     const fillDemoAdmin = () => {
@@ -18,8 +24,8 @@ const Login = ({ handleLogin }) => {
         setPassword("123")
     }
 
-    const fillDemoEmployee = () => {
-        setEmail("e@e.com")
+    const fillDemoEmployee = (empEmail = "e@e.com") => {
+        setEmail(empEmail)
         setPassword("123")
     }
 
@@ -31,16 +37,16 @@ const Login = ({ handleLogin }) => {
             <div className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-emerald-600/10 rounded-full blur-[120px] pointer-events-none'></div>
 
             {/* Login Glass Card */}
-            <div className='relative z-10 w-full max-w-md glass-panel p-8 md:p-10 rounded-3xl shadow-2xl border border-slate-800/80'>
+            <div className='relative z-10 w-full max-w-md glass-panel p-8 md:p-10 rounded-3xl shadow-2xl border border-slate-800/80 animate-fade-in'>
                 {/* Brand Header */}
                 <div className='flex flex-col items-center mb-8 text-center'>
-                    <div className='w-14 h-14 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-400 flex items-center justify-center shadow-lg shadow-emerald-500/20 mb-4'>
+                    <div className='w-14 h-14 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-400 flex items-center justify-center shadow-lg shadow-emerald-500/20 mb-4 transform hover:scale-105 transition-transform'>
                         <ShieldCheck className='w-8 h-8 text-slate-950 stroke-[2.5]' />
                     </div>
                     <h1 className='text-3xl font-extrabold text-white tracking-tight flex items-center gap-2'>
                         EMS <span className='text-emerald-400 font-bold'>Pro</span>
                     </h1>
-                    <p className='text-sm text-slate-400 mt-1 font-medium'>Sign in to manage your tasks and workforce</p>
+                    <p className='text-sm text-slate-400 mt-1 font-medium'>Sign in to manage your workforce & active tasks</p>
                 </div>
 
                 {/* Form */}
@@ -91,9 +97,17 @@ const Login = ({ handleLogin }) => {
                     {/* Submit Button */}
                     <button
                         type="submit"
-                        className='w-full mt-2 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-bold text-base py-3 px-6 rounded-xl shadow-lg shadow-emerald-500/25 transition-all transform active:scale-[0.98] flex items-center justify-center gap-2'
+                        disabled={isSubmitting}
+                        className='w-full mt-2 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 disabled:opacity-70 text-slate-950 font-bold text-base py-3 px-6 rounded-xl shadow-lg shadow-emerald-500/25 transition-all transform active:scale-[0.98] flex items-center justify-center gap-2'
                     >
-                        <span>Sign In to Dashboard</span>
+                        {isSubmitting ? (
+                            <>
+                                <Loader2 className='w-5 h-5 animate-spin text-slate-950' />
+                                <span>Signing in...</span>
+                            </>
+                        ) : (
+                            <span>Sign In to Dashboard</span>
+                        )}
                     </button>
                 </form>
 
@@ -114,11 +128,11 @@ const Login = ({ handleLogin }) => {
                         </button>
                         <button
                             type="button"
-                            onClick={fillDemoEmployee}
+                            onClick={() => fillDemoEmployee("e@e.com")}
                             className='flex items-center justify-center gap-2 bg-slate-900/90 hover:bg-slate-800 text-xs font-semibold text-slate-200 py-2.5 px-3 rounded-lg border border-slate-700/60 hover:border-blue-500/50 transition-all'
                         >
                             <UserCheck className='w-3.5 h-3.5 text-blue-400' />
-                            <span>Employee Demo</span>
+                            <span>Arjun (Employee)</span>
                         </button>
                     </div>
                 </div>
