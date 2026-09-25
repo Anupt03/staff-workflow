@@ -203,8 +203,10 @@ const employees = [
     {
         "id": 6,
         "firstName": "Pranav",
-        "email": "pranav@example.com",
+        "email": "pranavgg@gmail.com",
         "password": "123",
+        "role": "employee",
+        "department": "Engineering",
         "taskCounts": {
             "active": 1,
             "newTask": 1,

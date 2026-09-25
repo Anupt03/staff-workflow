@@ -102,6 +102,13 @@ const UserManagement = () => {
         }
     }
 
+    const handleRoleChange = async (userId, userName, newRole) => {
+        if (actions && actions.updateUserRole) {
+            await actions.updateUserRole(userId, newRole)
+            showToast(`Role for ${userName} updated to ${newRole.toUpperCase()}!`, 'success')
+        }
+    }
+
     return (
         <div className="space-y-6 mt-6 animate-fade-in">
             {/* Top Form: Onboard New Staff Account */}
@@ -227,8 +234,8 @@ const UserManagement = () => {
                             <Users className="w-5 h-5" />
                         </div>
                         <div>
-                            <h2 className="text-lg font-bold text-white tracking-tight">Staff Account Management</h2>
-                            <p className="text-xs text-slate-400">View registered staff accounts, edit passwords, and manage permissions</p>
+                            <h2 className="text-lg font-bold text-white tracking-tight">Staff Account & Role Directory</h2>
+                            <p className="text-xs text-slate-400">View staff accounts, change roles dynamically, edit passwords, and manage permissions</p>
                         </div>
                     </div>
 
@@ -291,8 +298,20 @@ const UserManagement = () => {
                                         </div>
                                     </div>
 
-                                    {/* Action Buttons */}
-                                    <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
+                                    {/* Interactive Role Dropdown & Action Buttons */}
+                                    <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto justify-end">
+                                        {/* Change Role Selector */}
+                                        <select
+                                            value={(staff.role || 'employee').toLowerCase()}
+                                            onChange={(e) => handleRoleChange(staff.id, staff.firstName, e.target.value)}
+                                            className="bg-slate-900 border border-slate-700/80 text-slate-200 text-xs font-semibold py-1.5 px-2.5 rounded-lg outline-none focus:border-purple-500 cursor-pointer"
+                                        >
+                                            <option value="employee">Role: Employee</option>
+                                            <option value="admin">Role: Admin Lead</option>
+                                            <option value="hr">Role: HR Manager</option>
+                                            <option value="superadmin">Role: SuperAdmin</option>
+                                        </select>
+
                                         <button
                                             onClick={() => {
                                                 setEditingUser(staff)
@@ -301,7 +320,7 @@ const UserManagement = () => {
                                             className="bg-slate-800/80 hover:bg-slate-700 text-slate-200 text-xs font-semibold py-1.5 px-3 rounded-lg border border-slate-700 flex items-center gap-1.5 transition-all"
                                         >
                                             <Key className="w-3.5 h-3.5 text-amber-400" />
-                                            <span>Reset Password</span>
+                                            <span>Reset Pass</span>
                                         </button>
 
                                         <button

@@ -160,6 +160,35 @@ const AuthProvider = ({ children }) => {
         localStorage.setItem('employees', JSON.stringify(updated))
     }
 
+    // Update user role
+    const updateUserRole = async (userId, newRole) => {
+        if (isSupabaseConfigured && supabase && typeof userId === 'string' && userId.length > 20) {
+            try {
+                const { error } = await supabase
+                    .from('profiles')
+                    .update({ role: newRole })
+                    .eq('id', userId)
+
+                if (error) throw error
+                await fetchSupabaseData()
+                return true
+            } catch (err) {
+                console.error('Error updating role in Supabase:', err)
+            }
+        }
+
+        // Local state update
+        if (!userData) return
+        const updated = userData.map(user => {
+            if (user.id === userId) {
+                return { ...user, role: newRole }
+            }
+            return user
+        })
+        setUserData(updated)
+        localStorage.setItem('employees', JSON.stringify(updated))
+    }
+
     // Delete user account
     const deleteUserAccount = async (userId) => {
         if (isSupabaseConfigured && supabase && typeof userId === 'string' && userId.length > 20) {
@@ -330,6 +359,7 @@ const AuthProvider = ({ children }) => {
                 updateTaskStatus, 
                 createUserAccount, 
                 updateUserPassword, 
+                updateUserRole,
                 deleteUserAccount, 
                 refreshData: loadData 
             }
