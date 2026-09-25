@@ -5,13 +5,14 @@
 -- Enable UUID extension if not already enabled
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
--- 1. Create Profiles Table (Admins & Employees)
+-- 1. Create Profiles Table (SuperAdmin, HR, Admins & Employees)
 CREATE TABLE IF NOT EXISTS public.profiles (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     first_name TEXT NOT NULL,
     email TEXT UNIQUE NOT NULL,
     password TEXT NOT NULL DEFAULT '123',
-    role TEXT NOT NULL DEFAULT 'employee' CHECK (role IN ('admin', 'employee')),
+    role TEXT NOT NULL DEFAULT 'employee' CHECK (role IN ('superadmin', 'hr', 'admin', 'employee')),
+    department TEXT DEFAULT 'General',
     created_at TIMESTAMPTZ DEFAULT now()
 );
 
@@ -34,10 +35,11 @@ CREATE INDEX IF NOT EXISTS idx_tasks_assigned_to ON public.tasks(assigned_to);
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.tasks ENABLE ROW LEVEL SECURITY;
 
--- Allow anonymous read and write for simple application integration
+-- Allow public read and write for simple application integration
 CREATE POLICY "Allow public read access on profiles" ON public.profiles FOR SELECT USING (true);
 CREATE POLICY "Allow public insert on profiles" ON public.profiles FOR INSERT WITH CHECK (true);
 CREATE POLICY "Allow public update on profiles" ON public.profiles FOR UPDATE USING (true);
+CREATE POLICY "Allow public delete on profiles" ON public.profiles FOR DELETE USING (true);
 
 CREATE POLICY "Allow public read access on tasks" ON public.tasks FOR SELECT USING (true);
 CREATE POLICY "Allow public insert on tasks" ON public.tasks FOR INSERT WITH CHECK (true);
@@ -45,12 +47,15 @@ CREATE POLICY "Allow public update on tasks" ON public.tasks FOR UPDATE USING (t
 CREATE POLICY "Allow public delete on tasks" ON public.tasks FOR DELETE USING (true);
 
 -- ========================================================
--- SEED DATA
+-- SEED DATA FOR HIERARCHY
 -- ========================================================
 
--- Insert Admin Profile
-INSERT INTO public.profiles (id, first_name, email, password, role)
-VALUES ('00000000-0000-0000-0000-000000000001', 'Admin', 'admin@me.com', '123', 'admin')
+-- Insert Hierarchy Profiles
+INSERT INTO public.profiles (id, first_name, email, password, role, department)
+VALUES 
+    ('00000000-0000-0000-0000-000000000000', 'SuperAdmin', 'superadmin@me.com', '123', 'superadmin', 'Executive'),
+    ('00000000-0000-0000-0000-000000000002', 'HR Manager', 'hr@me.com', '123', 'hr', 'Human Resources'),
+    ('00000000-0000-0000-0000-000000000001', 'Admin Lead', 'admin@me.com', '123', 'admin', 'Management')
 ON CONFLICT (email) DO NOTHING;
 
 -- Insert Employees

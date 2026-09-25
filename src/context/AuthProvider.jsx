@@ -10,9 +10,7 @@ const AuthProvider = ({ children }) => {
 
     // Helper to format Supabase profiles + tasks into frontend structure
     const formatSupabaseData = (profiles, tasks) => {
-        const employeeProfiles = profiles.filter(p => p.role === 'employee' || !p.role)
-        
-        return employeeProfiles.map(profile => {
+        return profiles.map(profile => {
             const userTasks = tasks.filter(t => t.assigned_to === profile.id)
             
             const formattedTasks = userTasks.map(t => ({
@@ -37,10 +35,11 @@ const AuthProvider = ({ children }) => {
 
             return {
                 id: profile.id,
-                firstName: profile.first_name,
+                firstName: profile.first_name || profile.firstName,
                 email: profile.email,
-                password: profile.password,
-                role: profile.role,
+                password: profile.password || '123',
+                role: profile.role || 'employee',
+                department: profile.department || 'General',
                 taskCounts,
                 tasks: formattedTasks
             }
@@ -91,6 +90,100 @@ const AuthProvider = ({ children }) => {
         loadData()
     }, [])
 
+    // Create a new staff user account
+    const createUserAccount = async ({ firstName, email, password = '123', role = 'employee', department = 'General' }) => {
+        if (isSupabaseConfigured && supabase) {
+            try {
+                const { data: created, error } = await supabase
+                    .from('profiles')
+                    .insert([{
+                        first_name: firstName,
+                        email: email.toLowerCase().trim(),
+                        password: password.trim(),
+                        role: role,
+                        department: department
+                    }])
+                    .select()
+
+                if (error) throw error
+                await fetchSupabaseData()
+                return true
+            } catch (err) {
+                console.error('Error creating user profile in Supabase:', err)
+            }
+        }
+
+        // Local state fallback
+        const newUser = {
+            id: Date.now(),
+            firstName,
+            email: email.toLowerCase().trim(),
+            password,
+            role,
+            department,
+            taskCounts: { active: 0, newTask: 0, completed: 0, failed: 0 },
+            tasks: []
+        }
+
+        const currentData = [...(userData || []), newUser]
+        setUserData(currentData)
+        localStorage.setItem('employees', JSON.stringify(currentData))
+        return true
+    }
+
+    // Update user password
+    const updateUserPassword = async (userId, newPassword) => {
+        if (isSupabaseConfigured && supabase && typeof userId === 'string' && userId.length > 20) {
+            try {
+                const { error } = await supabase
+                    .from('profiles')
+                    .update({ password: newPassword })
+                    .eq('id', userId)
+
+                if (error) throw error
+                await fetchSupabaseData()
+                return true
+            } catch (err) {
+                console.error('Error updating password in Supabase:', err)
+            }
+        }
+
+        // Local state update
+        if (!userData) return
+        const updated = userData.map(user => {
+            if (user.id === userId) {
+                return { ...user, password: newPassword }
+            }
+            return user
+        })
+        setUserData(updated)
+        localStorage.setItem('employees', JSON.stringify(updated))
+    }
+
+    // Delete user account
+    const deleteUserAccount = async (userId) => {
+        if (isSupabaseConfigured && supabase && typeof userId === 'string' && userId.length > 20) {
+            try {
+                const { error } = await supabase
+                    .from('profiles')
+                    .delete()
+                    .eq('id', userId)
+
+                if (error) throw error
+                await fetchSupabaseData()
+                return true
+            } catch (err) {
+                console.error('Error deleting profile in Supabase:', err)
+            }
+        }
+
+        // Local state deletion
+        if (!userData) return
+        const updated = userData.filter(u => u.id !== userId)
+        setUserData(updated)
+        localStorage.setItem('employees', JSON.stringify(updated))
+    }
+
     // Create a new task in Supabase (or fallback to state/localStorage)
     const createTask = async ({ taskTitle, taskDescription, taskDate, category, asignTo }) => {
         if (isSupabaseConfigured && supabase) {
@@ -114,7 +207,8 @@ const AuthProvider = ({ children }) => {
                             first_name: cleanName,
                             email: newEmail,
                             password: '123',
-                            role: 'employee'
+                            role: 'employee',
+                            department: 'General'
                         }])
                         .select()
 
@@ -164,6 +258,8 @@ const AuthProvider = ({ children }) => {
                 firstName: cleanName,
                 email: `${cleanName.toLowerCase().replace(/\s+/g, '')}@example.com`,
                 password: "123",
+                role: 'employee',
+                department: 'General',
                 taskCounts: { active: 0, newTask: 1, completed: 0, failed: 0 },
                 tasks: [taskObj]
             }
@@ -226,7 +322,18 @@ const AuthProvider = ({ children }) => {
     }
 
     return (
-        <AuthContext.Provider value={[userData, setUserData, { createTask, updateTaskStatus, refreshData: loadData }]}>
+        <AuthContext.Provider value={[
+            userData, 
+            setUserData, 
+            { 
+                createTask, 
+                updateTaskStatus, 
+                createUserAccount, 
+                updateUserPassword, 
+                deleteUserAccount, 
+                refreshData: loadData 
+            }
+        ]}>
             {children}
         </AuthContext.Provider>
     )

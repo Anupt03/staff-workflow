@@ -112,27 +112,46 @@ const Login = ({ handleLogin }) => {
                 </form>
 
                 {/* Quick Demo Credentials Autofill Section */}
-                <div className='mt-8 pt-6 border-t border-slate-800/80 text-center'>
+                <div className='mt-6 pt-5 border-t border-slate-800/80 text-center'>
                     <div className='flex items-center justify-center gap-1.5 text-xs text-slate-400 font-semibold mb-3'>
                         <Sparkles className='w-3.5 h-3.5 text-amber-400' />
-                        <span>Quick Demo Shortcuts (1-Click Fill):</span>
+                        <span>1-Click Role Demo Login:</span>
                     </div>
-                    <div className='grid grid-cols-2 gap-2.5'>
+                    <div className='grid grid-cols-2 gap-2'>
                         <button
                             type="button"
-                            onClick={fillDemoAdmin}
-                            className='flex items-center justify-center gap-2 bg-slate-900/90 hover:bg-slate-800 text-xs font-semibold text-slate-200 py-2.5 px-3 rounded-lg border border-slate-700/60 hover:border-emerald-500/50 transition-all'
+                            onClick={() => { setEmail("superadmin@me.com"); setPassword("123"); }}
+                            className='flex items-center justify-center gap-1.5 bg-slate-900/90 hover:bg-purple-950/60 text-xs font-semibold text-purple-300 py-2 px-2.5 rounded-lg border border-purple-500/30 transition-all'
+                        >
+                            <UserCheck className='w-3.5 h-3.5 text-purple-400' />
+                            <span>SuperAdmin</span>
+                        </button>
+
+                        <button
+                            type="button"
+                            onClick={() => { setEmail("hr@me.com"); setPassword("123"); }}
+                            className='flex items-center justify-center gap-1.5 bg-slate-900/90 hover:bg-sky-950/60 text-xs font-semibold text-sky-300 py-2 px-2.5 rounded-lg border border-sky-500/30 transition-all'
+                        >
+                            <UserCheck className='w-3.5 h-3.5 text-sky-400' />
+                            <span>HR Manager</span>
+                        </button>
+
+                        <button
+                            type="button"
+                            onClick={() => { setEmail("admin@me.com"); setPassword("123"); }}
+                            className='flex items-center justify-center gap-1.5 bg-slate-900/90 hover:bg-indigo-950/60 text-xs font-semibold text-indigo-300 py-2 px-2.5 rounded-lg border border-indigo-500/30 transition-all'
+                        >
+                            <UserCheck className='w-3.5 h-3.5 text-indigo-400' />
+                            <span>Admin Lead</span>
+                        </button>
+
+                        <button
+                            type="button"
+                            onClick={() => { setEmail("e@e.com"); setPassword("123"); }}
+                            className='flex items-center justify-center gap-1.5 bg-slate-900/90 hover:bg-emerald-950/60 text-xs font-semibold text-emerald-300 py-2 px-2.5 rounded-lg border border-emerald-500/30 transition-all'
                         >
                             <UserCheck className='w-3.5 h-3.5 text-emerald-400' />
-                            <span>Admin Demo</span>
-                        </button>
-                        <button
-                            type="button"
-                            onClick={() => fillDemoEmployee("e@e.com")}
-                            className='flex items-center justify-center gap-2 bg-slate-900/90 hover:bg-slate-800 text-xs font-semibold text-slate-200 py-2.5 px-3 rounded-lg border border-slate-700/60 hover:border-blue-500/50 transition-all'
-                        >
-                            <UserCheck className='w-3.5 h-3.5 text-blue-400' />
-                            <span>Arjun (Employee)</span>
+                            <span>Employee (Arjun)</span>
                         </button>
                     </div>
                 </div>
